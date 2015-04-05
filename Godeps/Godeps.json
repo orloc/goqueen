@@ -1,0 +1,5 @@
+{
+	"ImportPath": "github.com/orloc/goqueen",
+	"GoVersion": "go1.4.2",
+	"Deps": []
+}
