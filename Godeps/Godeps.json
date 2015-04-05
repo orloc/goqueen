@@ -8,6 +8,10 @@
 			"Rev": "c48cfd5d9711c75acb6036d2698ef3aef7bb655a"
 		},
 		{
+			"ImportPath": "github.com/justinas/alice",
+			"Rev": "a3603a812e255d220672cd76841f4bdc3bc4b677"
+		},
+		{
 			"ImportPath": "github.com/labstack/echo",
 			"Comment": "v0.0.4-9-gb75aa02",
 			"Rev": "b75aa02cfe9458f1f32b4987cee48981f4193355"
