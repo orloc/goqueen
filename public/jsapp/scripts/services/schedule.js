@@ -8,7 +8,7 @@
  * Service in the redqueenUiApp.
  */
 angular.module('redqueenUiApp')
-  .service('Schedule', [ '$q', '$timeout', '$http', 'underscore', function($q, $timeout, $http, _) {
+  .service('Schedule', [ '$q', '$timeout', '$http', 'underscore', 'moment', function($q, $timeout, $http, _, moment) {
 
     function Schedule(data) {
       angular.extend(this, data);
@@ -53,7 +53,10 @@ angular.module('redqueenUiApp')
       var method = null;
 
       var fixTime = function(time) {
-        return time.length < 8 ? time + ':00' : time;
+        var t = time.length < 8 ? time + ':00' : time;
+
+        // make up some date because we dont care anyway
+        return moment('2015-05-12 '+t).unix();
       };
 
       var data = {

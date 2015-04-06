@@ -14,7 +14,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
 var cards map[string]model.Card
@@ -75,8 +74,6 @@ func main() {
 		app.CheckErr(jsonErr)
 
 		fmt.Printf("%+v\n", schedule)
-		os.Exit(1)
-
 		if err := c.Bind(schedule); err == nil {
 			sch := *schedule
 			fmt.Printf("%+v\n", sch)
