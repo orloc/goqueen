@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
 	"github.com/rs/cors"
 	"github.com/thoas/stats"
-	"net/http"
+	"io/ioutil"
+	"log"
+	"os"
 )
 
 type card struct {
@@ -18,7 +21,7 @@ type card struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-type log struct {
+type cardlog struct {
 	ID        int    `json:"id"`
 	Code      string `json:"code"`
 	ValidPin  string `json:"valid_pin"`
@@ -37,9 +40,47 @@ type scheudle struct {
 	Sun  int    `json:"sun"`
 }
 
+type AppConfig struct {
+	Assets string `json:"assets"`
+}
+
 var cards map[string]card
 
+var configPT *AppConfig = new(AppConfig)
+
+func checkErr(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+func loadConfig(path string, config *AppConfig) {
+	log.Print("Loading configuration...")
+	dat, err := ioutil.ReadFile(path)
+	checkErr(err)
+	fmt.Print(string(dat))
+
+}
+
+func getArgs() string {
+	// file
+	args := os.Args[1:]
+
+	if len(args) != 1 {
+		fmt.Printf("Usage: %s [asset_path]\n", os.Args[0])
+	}
+
+	return args[0]
+}
+
 func main() {
+
+	configPath := getArgs()
+
+	fmt.Print(configPath)
+
+	loadConfig(configPath, configPT)
+
 	e := echo.New()
 
 	e.Use(mw.Logger)
@@ -48,9 +89,12 @@ func main() {
 	s := stats.New()
 	e.Use(s.Handler)
 
+	e.Get("/", func(c *echo.Context) {
+	})
+
 	e.Get("/stats", func(c *echo.Context) {
 		c.JSON(200, s.Data())
 	})
 
-	e.Run(":2020")
+	e.Run(":8080")
 }
