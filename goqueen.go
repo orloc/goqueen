@@ -1,19 +1,14 @@
 package main
 
 import (
-	_ "database/sql"
-	"encoding/json"
-	"fmt"
+	_ "fmt"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
-	_ "github.com/mattn/go-sqlite3"
 	app "github.com/orloc/goqueen/app"
 	model "github.com/orloc/goqueen/model"
 	"github.com/rs/cors"
 	"github.com/thoas/stats"
-	"io/ioutil"
 	"log"
-	"net/http"
 )
 
 var cards map[string]model.Card
@@ -22,10 +17,12 @@ func handleOptions(c *echo.Context) {
 }
 
 func main() {
-	config := new(model.AppConfig)
 
+	config := new(model.AppConfig)
 	configPath := app.GetArgs()
 	app.LoadConfig(configPath, config)
+
+	scheduleManager := new(app.ScheduleManager)
 
 	log.Print("Configuration Loaded!")
 
@@ -57,6 +54,7 @@ func main() {
 	e.Get("/api/logs", func(c *echo.Context) {
 	})
 	e.Get("/api/schedules", func(c *echo.Context) {
+		scheduleManager.DoGet(c)
 	})
 	e.Get("/api/schedules/*", func(c *echo.Context) {
 	})
@@ -65,23 +63,7 @@ func main() {
 	e.Post("/api/cards", func(c *echo.Context) {
 	})
 	e.Post("/api/schedules", func(c *echo.Context) {
-		schedule := new(model.Schedule)
-
-		body, err := ioutil.ReadAll(c.Request.Body)
-		app.CheckErr(err)
-
-		jsonErr := json.Unmarshal(body, schedule)
-		app.CheckErr(jsonErr)
-
-		fmt.Printf("%+v\n", schedule)
-		if err := c.Bind(schedule); err == nil {
-			sch := *schedule
-			fmt.Printf("%+v\n", sch)
-
-		}
-
-		http.Error(c.Response, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-
+		scheduleManager.DoPost(c)
 	})
 
 	e.Get("/stats", func(c *echo.Context) {
