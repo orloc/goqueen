@@ -9,11 +9,18 @@ import (
 	"github.com/rs/cors"
 	"github.com/thoas/stats"
 	"log"
+	"net/http"
 )
 
 var cards map[string]model.Card
 
 func handleOptions(c *echo.Context) {
+}
+
+func CheckErr(e error) {
+	if e != nil {
+		panic(e)
+	}
 }
 
 func main() {
@@ -22,7 +29,11 @@ func main() {
 	configPath := app.GetArgs()
 	app.LoadConfig(configPath, config)
 
-	scheduleManager := new(app.ScheduleManager)
+	scheduleManager := app.ScheduleManager{
+		DbName: config.DbName, TableName: "schedules",
+	}
+
+	scheduleManager.SetupDB(false)
 
 	log.Print("Configuration Loaded!")
 
@@ -54,7 +65,8 @@ func main() {
 	e.Get("/api/logs", func(c *echo.Context) {
 	})
 	e.Get("/api/schedules", func(c *echo.Context) {
-		scheduleManager.DoGet(c)
+		result := scheduleManager.DoGet()
+		c.JSON(200, result)
 	})
 	e.Get("/api/schedules/*", func(c *echo.Context) {
 	})
@@ -63,7 +75,17 @@ func main() {
 	e.Post("/api/cards", func(c *echo.Context) {
 	})
 	e.Post("/api/schedules", func(c *echo.Context) {
-		scheduleManager.DoPost(c)
+		schedule := new(model.Schedule)
+
+		if err := c.Bind(schedule); err == nil {
+			sch := *schedule
+
+			scheduleManager.DoPost(schedule)
+
+			c.JSON(200, sch)
+		} else {
+			http.Error(c.Response, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		}
 	})
 
 	e.Get("/stats", func(c *echo.Context) {

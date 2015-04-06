@@ -6,6 +6,7 @@ type Schedule struct {
 	Mon       bool   `valid:"required"`
 	Tue       bool   `valid:"required"`
 	Wed       bool   `valid:"required"`
+	Thu       bool   `valid:"required"`
 	Fri       bool   `valid:"required"`
 	Sat       bool   `valid:"required"`
 	Sun       bool   `valid:"required"`
