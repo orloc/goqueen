@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	_ "database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/rs/cors"
 	"github.com/thoas/stats"
 	"io/ioutil"
