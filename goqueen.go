@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
@@ -41,26 +42,10 @@ type scheudle struct {
 }
 
 type AppConfig struct {
-	Assets string `json:"assets"`
+	AssetPath string `json:"AssetPath"`
 }
 
 var cards map[string]card
-
-var configPT *AppConfig = new(AppConfig)
-
-func checkErr(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
-
-func loadConfig(path string, config *AppConfig) {
-	log.Print("Loading configuration...")
-	dat, err := ioutil.ReadFile(path)
-	checkErr(err)
-	fmt.Print(string(dat))
-
-}
 
 func getArgs() string {
 	// file
@@ -74,13 +59,36 @@ func getArgs() string {
 	return args[0]
 }
 
+func loadConfig(path string, config *AppConfig) {
+	log.Print("Loading configuration...")
+	dat, err := ioutil.ReadFile(path)
+	checkErr(err)
+
+	jsonErr := json.Unmarshal(dat, config)
+	checkErr(jsonErr)
+
+}
+
+func checkErr(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
 func main() {
+
+	var config AppConfig = AppConfig{""}
 
 	configPath := getArgs()
 
-	fmt.Print(configPath)
+	loadConfig(configPath, &config)
 
-	loadConfig(configPath, configPT)
+	if len(config.AssetPath) == 0 {
+		fmt.Printf("Error loading configuration\n")
+		os.Exit(1)
+	}
+
+	fmt.Println(config.AssetPath)
 
 	e := echo.New()
 
