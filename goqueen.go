@@ -67,7 +67,8 @@ func getArgs() string {
 	args := os.Args[1:]
 
 	if len(args) != 1 {
-		fmt.Printf("Usage: %s [asset_path]\n", os.Args[0])
+		fmt.Printf("Must specify asset location\n\nUsage: %s [asset_path]\n", os.Args[0])
+		os.Exit(1)
 	}
 
 	return args[0]
