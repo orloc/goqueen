@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/asaskevich/govalidator"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
 	"github.com/rs/cors"
@@ -42,13 +44,23 @@ type scheudle struct {
 }
 
 type AppConfig struct {
-	AssetPath string `json:"AssetPath"`
+	AssetPath string `valid:"required"`
+}
+
+func (config AppConfig) getAsset(path string) string {
+
+	var buffer bytes.Buffer
+
+	buffer.WriteString(config.AssetPath)
+	buffer.WriteString("/")
+	buffer.WriteString(path)
+
+	return buffer.String()
 }
 
 var cards map[string]card
 
 func getArgs() string {
-	// file
 	args := os.Args[1:]
 
 	if len(args) != 1 {
@@ -60,12 +72,14 @@ func getArgs() string {
 }
 
 func loadConfig(path string, config *AppConfig) {
-	log.Print("Loading configuration...")
 	dat, err := ioutil.ReadFile(path)
 	checkErr(err)
 
 	jsonErr := json.Unmarshal(dat, config)
 	checkErr(jsonErr)
+
+	_, validErr := govalidator.ValidateStruct(*config)
+	checkErr(validErr)
 
 }
 
@@ -75,20 +89,16 @@ func checkErr(e error) {
 	}
 }
 
-func main() {
+func handleOptions(c *echo.Context) {
+}
 
-	var config AppConfig = AppConfig{""}
+func main() {
+	config := &AppConfig{AssetPath: ""}
 
 	configPath := getArgs()
+	loadConfig(configPath, config)
 
-	loadConfig(configPath, &config)
-
-	if len(config.AssetPath) == 0 {
-		fmt.Printf("Error loading configuration\n")
-		os.Exit(1)
-	}
-
-	fmt.Println(config.AssetPath)
+	log.Print("Configuration Loaded!")
 
 	e := echo.New()
 
@@ -98,7 +108,27 @@ func main() {
 	s := stats.New()
 	e.Use(s.Handler)
 
-	e.Get("/", func(c *echo.Context) {
+	e.Index(config.getAsset("index.html"))
+	e.Static("/styles", config.AssetPath+"/styles")
+	e.Static("/images", config.AssetPath+"/images")
+	e.Static("/scripts", config.AssetPath+"/scripts")
+	e.Static("/views", config.AssetPath+"/views")
+
+	e.Options("/api/cards", handleOptions)
+	e.Options("/api/cards/*", handleOptions)
+	e.Options("/api/logs", handleOptions)
+	e.Options("/api/schedules", handleOptions)
+	e.Options("/api/schedules/*", handleOptions)
+
+	e.Get("/api/cards", func(c *echo.Context) {
+	})
+	e.Get("/api/cards/*", func(c *echo.Context) {
+	})
+	e.Get("/api/logs", func(c *echo.Context) {
+	})
+	e.Get("/api/schedules", func(c *echo.Context) {
+	})
+	e.Get("/api/schedules/*", func(c *echo.Context) {
 	})
 
 	e.Get("/stats", func(c *echo.Context) {
