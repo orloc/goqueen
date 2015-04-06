@@ -1,13 +1,14 @@
 package model
 
-type Scheudle struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Mon  int    `json:"mon"`
-	Tue  int    `json:"tue"`
-	Wed  int    `json:"wed"`
-	Thu  int    `json:"thu"`
-	Fri  int    `json:"fri"`
-	Sat  int    `json:"sat"`
-	Sun  int    `json:"sun"`
+type Schedule struct {
+	Id        int
+	Name      string `valid:"required"`
+	Mon       bool   `valid:"required"`
+	Tue       bool   `valid:"required"`
+	Wed       bool   `valid:"required"`
+	Fri       bool   `valid:"required"`
+	Sat       bool   `valid:"required"`
+	Sun       bool   `valid:"required"`
+	StartTime int64  `valid:"required"`
+	EndTime   int64  `valid:"required"`
 }
