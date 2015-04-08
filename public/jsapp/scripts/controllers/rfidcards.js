@@ -17,7 +17,7 @@ angular.module('redqueenUiApp')
     });
 
     $scope.edit = function RfidCardsCtrlEdit(rfidCard) {
-      $location.path('/rfidcards/' + rfidCard.id + '/edit');
+      $location.path('/rfidcards/' + rfidCard.Id + '/edit');
     };
 
   }]);

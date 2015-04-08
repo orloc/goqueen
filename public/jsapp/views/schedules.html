@@ -36,8 +36,8 @@
       <span class="label label-danger" ng-hide="schedule.Wed">No</span>
     </td>
     <td>
-      <span class="label label-success" ng-show="schedule.thu">Yes</span>
-      <span class="label label-danger" ng-hide="schedule.thu">No</span>
+      <span class="label label-success" ng-show="schedule.Thu">Yes</span>
+      <span class="label label-danger" ng-hide="schedule.Thu">No</span>
     </td>
     <td>
       <span class="label label-success" ng-show="schedule.Fri">Yes</span>
@@ -51,8 +51,8 @@
       <span class="label label-success" ng-show="schedule.Sun">Yes</span>
       <span class="label label-danger" ng-hide="schedule.Sun">No</span>
     </td>
-    <td>{{ schedule.StartTime }}</td>
-    <td>{{ schedule.EndTime }}</td>
+    <td>{{ schedule.StartTime | date: 'HH:mm:ss Z'}}</td>
+    <td>{{ schedule.EndTime | date: 'HH:mm:ss Z'}}</td>
     <td>
       <div class="btn-group">
         <a class="btn btn-default" ng-click="edit(schedule)">Edit</a>
