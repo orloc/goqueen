@@ -16,7 +16,7 @@ type ScheduleManager struct {
 
 func (manager ScheduleManager) SetupDB(trucate bool) {
 
-	db, err := sql.Open("sqlite3", "./goqueen.db")
+	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
 	CheckErr(err)
 	defer db.Close()
 
@@ -46,7 +46,7 @@ func (manager ScheduleManager) SetupDB(trucate bool) {
 }
 
 func (manager ScheduleManager) DoPost(schedule *model.Schedule) {
-	db, err := sql.Open("sqlite3", "./goqueen.db")
+	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
 	CheckErr(err)
 	defer db.Close()
 
@@ -64,10 +64,10 @@ func (manager ScheduleManager) DoPost(schedule *model.Schedule) {
 
 }
 
-func (manager ScheduleManager) DoGet() map[string]model.Schedule {
-	var results map[string]model.Schedule
+func (manager ScheduleManager) DoGet() []model.Schedule {
+	var results []model.Schedule
 
-	db, err := sql.Open("sqlite3", "./goqueen.db")
+	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
 	CheckErr(err)
 	defer db.Close()
 
@@ -75,12 +75,13 @@ func (manager ScheduleManager) DoGet() map[string]model.Schedule {
 	CheckErr(err)
 
 	defer rows.Close()
-	// NOTE not implemented yet
-	/*
-		for rows.Next() {
+	for rows.Next() {
+		sch := new(model.Schedule)
+		rows.Scan(&sch.Id, &sch.Name, &sch.Mon, &sch.Tue, &sch.Wed, &sch.Thu, &sch.Fri, &sch.Sat, &sch.Sun, &sch.StartTime, &sch.EndTime)
 
-		}
-	*/
+		results = append(results, *sch)
+	}
+	rows.Close()
 
 	return results
 }
