@@ -7,6 +7,7 @@ import (
 	model "github.com/orloc/goqueen/model"
 	"log"
 	_ "os"
+	"strconv"
 )
 
 type ScheduleManager struct {
@@ -64,8 +65,27 @@ func (manager ScheduleManager) DoPost(schedule *model.Schedule) {
 
 }
 
+func (manager ScheduleManager) DoGetById(id string) model.Schedule {
+	var sch model.Schedule = model.Schedule{}
+
+	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
+	CheckErr(err)
+	defer db.Close()
+
+	intId, err := strconv.ParseInt(id, 10, 64)
+	CheckErr(err)
+
+	rows, err := db.Query(fmt.Sprintf("select * from %s where id = %d limit 1", manager.TableName, intId))
+	CheckErr(err)
+	defer rows.Close()
+
+	rows.Next()
+	rows.Scan(&sch.Id, &sch.Name, &sch.Mon, &sch.Tue, &sch.Wed, &sch.Thu, &sch.Fri, &sch.Sat, &sch.Sun, &sch.StartTime, &sch.EndTime)
+
+	return sch
+}
+
 func (manager ScheduleManager) DoGet() []model.Schedule {
-	var results []model.Schedule
 
 	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
 	CheckErr(err)
@@ -75,13 +95,14 @@ func (manager ScheduleManager) DoGet() []model.Schedule {
 	CheckErr(err)
 
 	defer rows.Close()
+	var results []model.Schedule
+
 	for rows.Next() {
 		sch := new(model.Schedule)
 		rows.Scan(&sch.Id, &sch.Name, &sch.Mon, &sch.Tue, &sch.Wed, &sch.Thu, &sch.Fri, &sch.Sat, &sch.Sun, &sch.StartTime, &sch.EndTime)
 
 		results = append(results, *sch)
 	}
-	rows.Close()
 
 	return results
 }

@@ -12,8 +12,6 @@ import (
 	"net/http"
 )
 
-var cards map[string]model.Card
-
 func handleOptions(c *echo.Context) {
 }
 
@@ -45,35 +43,48 @@ func main() {
 	s := stats.New()
 	e.Use(s.Handler)
 
+	// ======= Routes ======= //
+
+	/*
+	 * UI Assets
+	 */
 	e.Index(config.GetAsset("index.html"))
 	e.Static("/styles", config.GetAsset("/styles"))
 	e.Static("/images", config.GetAsset("/images"))
 	e.Static("/scripts", config.GetAsset("/scripts"))
 	e.Static("/views", config.GetAsset("/views"))
 
-	e.Options("/api/cards", handleOptions)
-	e.Options("/api/cards/*", handleOptions)
-	e.Options("/api/logs", handleOptions)
-	e.Options("/api/schedules", handleOptions)
-	e.Options("/api/schedules/*", handleOptions)
-
-	// Gets
+	/*
+	 * Cards
+	 */
 	e.Get("/api/cards", func(c *echo.Context) {
 	})
-	e.Get("/api/cards/*", func(c *echo.Context) {
+	e.Get("/api/cards/:id", func(c *echo.Context) {
 	})
-	e.Get("/api/logs", func(c *echo.Context) {
+
+	e.Post("/api/cards", func(c *echo.Context) {
 	})
+
+	e.Options("/api/cards", handleOptions)
+	e.Options("/api/cards/*", handleOptions)
+
+	/*
+	 * Scheudles
+	 */
 	e.Get("/api/schedules", func(c *echo.Context) {
 		result := scheduleManager.DoGet()
 		c.JSON(200, result)
 	})
-	e.Get("/api/schedules/*", func(c *echo.Context) {
+
+	e.Get("/api/schedules/:id", func(c *echo.Context) {
+		schedule := scheduleManager.DoGetById(c.P(0))
+		if schedule.Id == 0 {
+			http.Error(c.Response, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		} else {
+			c.JSON(200, schedule)
+		}
 	})
 
-	// Posts
-	e.Post("/api/cards", func(c *echo.Context) {
-	})
 	e.Post("/api/schedules", func(c *echo.Context) {
 		schedule := new(model.Schedule)
 
@@ -87,7 +98,19 @@ func main() {
 			http.Error(c.Response, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		}
 	})
+	e.Options("/api/schedules", handleOptions)
+	e.Options("/api/schedules/*", handleOptions)
 
+	/*
+	 * Logs
+	 */
+	e.Get("/api/logs", func(c *echo.Context) {
+	})
+	e.Options("/api/logs", handleOptions)
+
+	/*
+	 * Misc
+	 */
 	e.Get("/stats", func(c *echo.Context) {
 		c.JSON(200, s.Data())
 	})
