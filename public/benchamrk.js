@@ -20,6 +20,10 @@
             method: 'get', 
             route: 'api/schedules',
         },
+        getScheduleById: {
+            method: 'get', 
+            route: 'api/schedules/' + (function()var randomnumber=Math.floor(Math.random()*100))(),
+        },
         postSchedules: {
             method: 'post',
             route: 'api/schedules',

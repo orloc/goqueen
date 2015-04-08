@@ -60,23 +60,23 @@ angular.module('redqueenUiApp')
       };
 
       var data = {
-        name: self.name,
-        mon: self.mon === true,
-        tue: self.tue === true,
-        wed: self.wed === true,
-        thu: self.thu === true,
-        fri: self.fri === true,
-        sat: self.sat === true,
-        sun: self.sun === true,
-        startTime: fixTime(self.startTime),
-        endTime: fixTime(self.endTime)
+        Name: self.Name,
+        Mon: self.Mon === true,
+        Tue: self.Tue === true,
+        Wed: self.Wed === true,
+        Thu: self.Thu === true,
+        Fri: self.Fri === true,
+        Sat: self.Sat === true,
+        Sun: self.Sun === true,
+        StartTime: fixTime(self.StartTime),
+        EndTime: fixTime(self.EndTime)
       };
 
       if (self.$isNew) {
         url = '/api/schedules';
         method = 'POST';
       } else {
-        url = '/api/schedules/' + self.id;
+        url = '/api/schedules/' + self.Id;
         method = 'PUT';
       }
 

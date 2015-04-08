@@ -46,7 +46,7 @@ func (manager ScheduleManager) SetupDB(trucate bool) {
 	}
 }
 
-func (manager ScheduleManager) DoPost(schedule *model.Schedule) {
+func (manager ScheduleManager) Save(schedule *model.Schedule) {
 	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
 	CheckErr(err)
 	defer db.Close()
@@ -65,7 +65,27 @@ func (manager ScheduleManager) DoPost(schedule *model.Schedule) {
 
 }
 
-func (manager ScheduleManager) DoGetById(id string) model.Schedule {
+func (manager ScheduleManager) Update(schedule *model.Schedule, scheduleId int) {
+
+	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
+	CheckErr(err)
+	defer db.Close()
+
+	tx, err := db.Begin()
+	CheckErr(err)
+
+	stmt, err := tx.Prepare(fmt.Sprintf("update %s set(name = ?, mon = ? , tue = ?, wed = ? , thu = ? , fri = ?, sat = ?, sun = ?, startTime = ?, endTime = ?) where id = ? ", manager.TableName))
+	CheckErr(err)
+
+	defer stmt.Close()
+	_, err = stmt.Exec(schedule.Name, schedule.Mon, schedule.Tue, schedule.Wed, schedule.Thu, schedule.Fri, schedule.Sat, schedule.Sun, schedule.StartTime, schedule.EndTime, scheduleId)
+
+	CheckErr(err)
+
+	tx.Commit()
+}
+
+func (manager ScheduleManager) GetById(id string) model.Schedule {
 	var sch model.Schedule = model.Schedule{}
 
 	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
@@ -85,7 +105,7 @@ func (manager ScheduleManager) DoGetById(id string) model.Schedule {
 	return sch
 }
 
-func (manager ScheduleManager) DoGet() []model.Schedule {
+func (manager ScheduleManager) GetAll() []model.Schedule {
 
 	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
 	CheckErr(err)

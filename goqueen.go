@@ -72,12 +72,12 @@ func main() {
 	 * Scheudles
 	 */
 	e.Get("/api/schedules", func(c *echo.Context) {
-		result := scheduleManager.DoGet()
+		result := scheduleManager.GetAll()
 		c.JSON(200, result)
 	})
 
 	e.Get("/api/schedules/:id", func(c *echo.Context) {
-		schedule := scheduleManager.DoGetById(c.P(0))
+		schedule := scheduleManager.GetById(c.P(0))
 		if schedule.Id == 0 {
 			http.Error(c.Response, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		} else {
@@ -91,7 +91,7 @@ func main() {
 		if err := c.Bind(schedule); err == nil {
 			sch := *schedule
 
-			scheduleManager.DoPost(schedule)
+			scheduleManager.Save(schedule)
 
 			c.JSON(200, sch)
 		} else {
