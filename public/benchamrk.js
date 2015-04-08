@@ -22,7 +22,9 @@
         },
         getScheduleById: {
             method: 'get', 
-            route: 'api/schedules/' + (function()var randomnumber=Math.floor(Math.random()*100))(),
+            route: 'api/schedules/' + (function() { 
+                return randomnumber=Math.floor(Math.random()*100);
+            })(),
         },
         postSchedules: {
             method: 'post',

@@ -47,7 +47,7 @@ func (manager ScheduleManager) SetupDB(trucate bool) {
 }
 
 func (manager ScheduleManager) Save(schedule *model.Schedule) {
-	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
+	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=2000")
 	CheckErr(err)
 	defer db.Close()
 
@@ -67,7 +67,7 @@ func (manager ScheduleManager) Save(schedule *model.Schedule) {
 
 func (manager ScheduleManager) Update(schedule *model.Schedule, scheduleId int) {
 
-	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
+	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=2000")
 	CheckErr(err)
 	defer db.Close()
 
