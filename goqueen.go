@@ -91,7 +91,7 @@ func main() {
 		if err := c.Bind(schedule); err == nil {
 			sch := *schedule
 
-			scheduleManager.Save(schedule)
+			sch.Id = scheduleManager.Save(schedule)
 
 			c.JSON(200, sch)
 		} else {

@@ -1,7 +1,7 @@
 package model
 
 type Schedule struct {
-	Id        int
+	Id        int64
 	Name      string `valid:"required"`
 	Mon       bool   `valid:"required"`
 	Tue       bool   `valid:"required"`
