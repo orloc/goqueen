@@ -6,13 +6,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	model "github.com/orloc/goqueen/model"
 	"log"
-	_ "os"
 	"strconv"
 )
 
 type ScheduleManager struct {
 	DbName    string
 	TableName string
+	Options   []string
 }
 
 func (manager ScheduleManager) SetupDB(trucate bool) {
@@ -22,7 +22,7 @@ func (manager ScheduleManager) SetupDB(trucate bool) {
 	defer db.Close()
 
 	sqlStmt := `
-		create table if not exists schedules (
+		create table if not exists ` + manager.TableName + ` (
 			id integer not null primary key,
 			name text not null,
 			mon integer not null,
@@ -37,7 +37,7 @@ func (manager ScheduleManager) SetupDB(trucate bool) {
 		);
 		`
 	if trucate {
-		sqlStmt = sqlStmt + `delete from schedules;`
+		sqlStmt = sqlStmt + `delete from ` + manager.TableName + `;`
 	}
 
 	if _, stmtErr := db.Exec(sqlStmt); stmtErr != nil {
@@ -46,7 +46,9 @@ func (manager ScheduleManager) SetupDB(trucate bool) {
 	}
 }
 
-func (manager ScheduleManager) Save(schedule *model.Schedule) int64 {
+func (manager ScheduleManager) Save(modelMap *ModelMap) int64 {
+	schedule := modelMap.Schedule
+
 	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=2000")
 	CheckErr(err)
 	defer db.Close()
@@ -68,7 +70,8 @@ func (manager ScheduleManager) Save(schedule *model.Schedule) int64 {
 
 }
 
-func (manager ScheduleManager) Update(schedule *model.Schedule, scheduleId int64) {
+func (manager ScheduleManager) Update(modelMap *ModelMap, scheduleId int64) {
+	schedule := modelMap.Schedule
 
 	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=2000")
 	CheckErr(err)
@@ -88,8 +91,8 @@ func (manager ScheduleManager) Update(schedule *model.Schedule, scheduleId int64
 	tx.Commit()
 }
 
-func (manager ScheduleManager) GetById(id string) model.Schedule {
-	var sch model.Schedule = model.Schedule{}
+func (manager ScheduleManager) GetById(id string) (entity *ModelMap) {
+	sch := new(model.Schedule)
 
 	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
 	CheckErr(err)
@@ -105,10 +108,12 @@ func (manager ScheduleManager) GetById(id string) model.Schedule {
 	rows.Next()
 	rows.Scan(&sch.Id, &sch.Name, &sch.Mon, &sch.Tue, &sch.Wed, &sch.Thu, &sch.Fri, &sch.Sat, &sch.Sun, &sch.StartTime, &sch.EndTime)
 
-	return sch
+	entity = manager.getResponse(*sch)
+
+	return
 }
 
-func (manager ScheduleManager) GetAll() []model.Schedule {
+func (manager ScheduleManager) GetAll() (results []*ModelMap) {
 
 	db, err := sql.Open("sqlite3", "./goqueen.db?_busy_timeout=600")
 	CheckErr(err)
@@ -118,14 +123,20 @@ func (manager ScheduleManager) GetAll() []model.Schedule {
 	CheckErr(err)
 
 	defer rows.Close()
-	var results []model.Schedule
 
 	for rows.Next() {
 		sch := new(model.Schedule)
 		rows.Scan(&sch.Id, &sch.Name, &sch.Mon, &sch.Tue, &sch.Wed, &sch.Thu, &sch.Fri, &sch.Sat, &sch.Sun, &sch.StartTime, &sch.EndTime)
 
-		results = append(results, *sch)
+		r := manager.getResponse(*sch)
+		results = append(results, r)
 	}
 
-	return results
+	return
+}
+
+func (manager ScheduleManager) getResponse(sch model.Schedule) *ModelMap {
+	response := new(ModelMap)
+	response.Schedule = &sch
+	return response
 }

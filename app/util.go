@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/asaskevich/govalidator"
-	model "github.com/orloc/goqueen/model"
 	"io/ioutil"
 	"os"
 )
@@ -20,7 +19,7 @@ func GetArgs() string {
 	return args[0]
 }
 
-func LoadConfig(path string, config *model.AppConfig) {
+func LoadConfig(path string, config *AppConfig) {
 	dat, err := ioutil.ReadFile(path)
 	CheckErr(err)
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	_ "fmt"
+	"fmt"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
 	app "github.com/orloc/goqueen/app"
@@ -23,15 +23,32 @@ func CheckErr(e error) {
 
 func main() {
 
-	config := new(model.AppConfig)
+	config := new(app.AppConfig)
 	configPath := app.GetArgs()
 	app.LoadConfig(configPath, config)
 
+	fmt.Printf("%+v\n", config)
+
 	scheduleManager := app.ScheduleManager{
-		DbName: config.DbName, TableName: "schedules",
+		DbName:    config.DbName,
+		TableName: "schedules",
+		Options:   config.DbConfig,
 	}
 
-	scheduleManager.SetupDB(false)
+	cardManager := app.CardManager{
+		DbName:    config.DbName,
+		TableName: "schedules",
+		Options:   config.DbConfig,
+	}
+
+	managers := [...]app.ModelManager{
+		scheduleManager,
+		cardManager,
+	}
+
+	for _, m := range managers {
+		m.SetupDB(false)
+	}
 
 	log.Print("Configuration Loaded!")
 
@@ -58,6 +75,8 @@ func main() {
 	 * Cards
 	 */
 	e.Get("/api/cards", func(c *echo.Context) {
+		result := cardManager.GetAll()
+		c.JSON(200, result)
 	})
 	e.Get("/api/cards/:id", func(c *echo.Context) {
 	})
@@ -77,7 +96,9 @@ func main() {
 	})
 
 	e.Get("/api/schedules/:id", func(c *echo.Context) {
-		schedule := scheduleManager.GetById(c.P(0))
+		response := scheduleManager.GetById(c.P(0))
+		schedule := response.Schedule
+
 		if schedule.Id == 0 {
 			http.Error(c.Response, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		} else {
@@ -91,7 +112,9 @@ func main() {
 		if err := c.Bind(schedule); err == nil {
 			sch := *schedule
 
-			sch.Id = scheduleManager.Save(schedule)
+			request := &app.ModelMap{Schedule: &sch}
+
+			sch.Id = scheduleManager.Save(request)
 
 			c.JSON(200, sch)
 		} else {
