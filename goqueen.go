@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/labstack/echo"
 	mw "github.com/labstack/echo/middleware"
+	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 	app "github.com/orloc/goqueen/app"
 	model "github.com/orloc/goqueen/model"
 	"github.com/rs/cors"
@@ -37,7 +39,7 @@ func main() {
 
 	cardManager := app.CardManager{
 		DbName:    config.DbName,
-		TableName: "schedules",
+		TableName: "cards",
 		Options:   config.DbConfig,
 	}
 
@@ -79,6 +81,14 @@ func main() {
 		c.JSON(200, result)
 	})
 	e.Get("/api/cards/:id", func(c *echo.Context) {
+		response := scheduleManager.GetById(c.P(0))
+		card := response.Card
+
+		if card.Id == 0 {
+			http.Error(c.Response, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		} else {
+			c.JSON(200, card)
+		}
 	})
 
 	e.Post("/api/cards", func(c *echo.Context) {
@@ -104,6 +114,15 @@ func main() {
 		} else {
 			c.JSON(200, schedule)
 		}
+	})
+
+	e.Put("/api/schedules/:id", func(c *echo.Context) {
+		response := scheduleManager.GetById(c.P(0))
+
+		scheduleManager.Update(response, response.Schedule.Id)
+
+		c.JSON(200, response.Schedule)
+
 	})
 
 	e.Post("/api/schedules", func(c *echo.Context) {

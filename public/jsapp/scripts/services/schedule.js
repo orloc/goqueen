@@ -13,15 +13,18 @@ angular.module('redqueenUiApp')
     function Schedule(data) {
       angular.extend(this, data);
 
-      this.$isNew = (typeof(this.id) === 'undefined' || !this.id);
+      this.$isNew = (typeof(this.Id) === 'undefined' || !this.Id);
+
+      console.log(this.$isNew);
     }
 
     Schedule.all = function ScheduleResourceAll() {
       var deferred = $q.defer();
 
       $http.get('/api/schedules').then(function(data) {
-        var schedules = _.map(data.data, function(card) {
-          return new Schedule(card);
+        var schedules = _.map(data.data, function(modelMap) {
+            var sch = modelMap.Schedule;
+            return new Schedule(sch);
         });
 
         deferred.resolve(schedules);
@@ -37,6 +40,12 @@ angular.module('redqueenUiApp')
 
       $http.get('/api/schedules/' + id).then(function(data) {
         var schedule = new Schedule(data.data);
+
+        var sTime = moment(schedule.StartTime);
+        var eTime = moment(schedule.EndTime);
+
+        schedule.StartTime = sTime.format('HH:mm:ss');
+        schedule.EndTime = eTime.format('HH:mm:ss');
 
         deferred.resolve(schedule);
       }, function() {

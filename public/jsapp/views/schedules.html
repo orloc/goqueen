@@ -4,6 +4,7 @@
 <table class="table">
   <thead>
   <tr>
+    <th>Id</th>
     <th>Name</th>
     <th>Mon</th>
     <th>Tue</th>
@@ -22,6 +23,7 @@
     <td colspan="4">No schedules added.</td>
   </tr>
   <tr ng-repeat="schedule in schedules">
+    <td>{{ schedule.Id }}</td>
     <td>{{ schedule.Name }}</td>
     <td>
       <span class="label label-success" ng-show="schedule.Mon">Yes</span>
