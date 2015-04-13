@@ -5,9 +5,10 @@ import (
 )
 
 type AppConfig struct {
-	AssetPath string   `valid:"required"`
-	DbName    string   `valid:"required"`
-	DbConfig  []string `valid:"required"`
+	AssetPath  string   `valid:"required"`
+	DbName     string   `valid:"required"`
+	DbConfig   []string `valid:"required"`
+	DaemonPort string   `valid:"required"`
 }
 
 func (config AppConfig) GetAsset(path string) string {

@@ -157,5 +157,5 @@ func main() {
 		c.JSON(200, s.Data())
 	})
 
-	e.Run(":8080")
+	e.Run(fmt.Sprintf(":%s", config.DaemonPort))
 }

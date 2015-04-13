@@ -3,6 +3,6 @@
     "dbname": "goqueen.db",
     "dbconfig": [
         "_busy_timeout=600"
-    ]
-    
+    ],
+    "DaemonPort": "8080"
 }
